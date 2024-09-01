@@ -156,6 +156,10 @@ int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 void            syscall(void);
 
+// OSTEP project
+// sysfile.c
+void sysinit(void);
+
 // timer.c
 void            timerinit(void);
 

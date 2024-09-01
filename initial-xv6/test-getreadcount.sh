@@ -8,5 +8,3 @@ if ! [[ -d src ]]; then
 fi
 
 ../tester/run-tests.sh $*
-
-

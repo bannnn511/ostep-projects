@@ -16,6 +16,15 @@
 #include "file.h"
 #include "fcntl.h"
 
+// OSTEP project
+int readcount = 0;
+struct spinlock readlock;
+
+// OSTEP project
+void sysinit(void) {
+    initlock(&readlock, "read");
+}
+
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -66,14 +75,18 @@ sys_dup(void)
   return fd;
 }
 
-// OSTEP project
-int readcount = 0;
+
 
 // OSTEP project
 int
 sys_getreadcount(void)
 {
-    return readcount;
+    int count = 0;
+    acquire(&readlock);
+    count = readcount;
+    release(&readlock);
+
+    return count;
 }
 
 int
@@ -82,6 +95,11 @@ sys_read(void)
   struct file *f;
   int n;
   char *p;
+
+  // OSTEP project
+  acquire(&readlock);
+  readcount++;
+  release(&readlock);
 
   if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
     return -1;
