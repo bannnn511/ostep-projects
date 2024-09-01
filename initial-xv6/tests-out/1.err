@@ -1,1 +1,4 @@
-/usr/bin/env: ‘expect’: No such file or directory
+expect: spawn id exp6 not open
+    while executing
+"expect "$ ""
+    (file "../../tester/run-xv6-command.exp" line 25)
