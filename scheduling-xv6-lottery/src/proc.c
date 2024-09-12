@@ -519,7 +519,10 @@ void procdump(void) {
 long seed = 1;
 
 // Function to generate the next random number
-long int random() { seed = (1103515245U * seed + 12345U) & 0x7fffffff; }
+long int random() {
+  seed = (1103515245U * seed + 12345U) & 0x7fffffff;
+  return seed;
+}
 
 // random choose a winner ticket between 0 and totaltickets
 // https://stackoverflow.com/questions/2509679/how-to-generate-a-random-integer-number-from-within-a-range
