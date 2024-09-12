@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
 struct {
   struct spinlock lock;
@@ -183,6 +184,8 @@ int fork(void) {
   }
   np->sz = curproc->sz;
   np->parent = curproc;
+  // OSTEP
+  np->tickets = curproc->tickets;
   *np->tf = *curproc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
@@ -328,7 +331,6 @@ void scheduler(void) {
 
       // OSTEP
       counter += p->tickets;
-      cprintf("counter: %d, winner: %d\n", counter, winner);
       if (counter <= winner) {
         continue;
       }
@@ -341,7 +343,8 @@ void scheduler(void) {
       p->state = RUNNING;
 
       // OSTEP
-      cprintf("process about to run: %s, [%d]\n", p->name, p->pid);
+      // cprintf("process about to run: %s, [%d]\n", p->name, p->pid);
+      int ticks0 = ticks;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
@@ -349,6 +352,11 @@ void scheduler(void) {
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+      p->ticks = ticks - ticks0;
+      if (p->tickets > 1) {
+        cprintf("XV6_TEST_OUTPUT pid: %d, parent: %d, tickets:%d, ticks: %d\n",
+                p->pid, p->parent->pid, p->tickets, p->ticks);
+      }
     }
     release(&ptable.lock);
   }
@@ -544,4 +552,26 @@ long getwinner(int totaltickets) {
 
   // Truncated division is intentional
   return x / bin_size;
+}
+
+// OSTEP
+int settickets(int n) {
+  struct proc *p = myproc();
+  acquire(&ptable.lock);
+  p->tickets = n;
+  release(&ptable.lock);
+
+  return 0;
+}
+
+// OSTEP
+int getpinfo(struct pstat *p) {
+  for (int i = 0; i < NPROC; i++) {
+    p->inuse[i] = ptable.proc[i].state != UNUSED;
+    p->pid[i] = ptable.proc[i].pid;
+    p->tickets[i] = ptable.proc[i].tickets;
+    p->ticks[i] = ptable.proc[i].ticks;
+  }
+
+  return 0;
 }

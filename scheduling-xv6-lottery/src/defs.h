@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct pstat;
 
 // bio.c
 void            binit(void);
@@ -122,6 +123,8 @@ void            wakeup(void*);
 void            yield(void);
 // OSTEP
 long getwinner(int);
+int settickets(int);
+int getpinfo(struct pstat*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

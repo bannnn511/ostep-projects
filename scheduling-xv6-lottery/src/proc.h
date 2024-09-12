@@ -52,7 +52,7 @@ struct proc {
 
   // OSTEP
   int tickets; // tickets for this process to run
-  // int ticks;  // number of ticks of this process
+  int ticks;  // number of ticks of this process
 };
 
 // Process memory is laid out contiguously, low addresses first:

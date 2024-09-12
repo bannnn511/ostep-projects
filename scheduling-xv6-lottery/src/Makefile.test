@@ -175,6 +175,7 @@ UPROGS=\
 	_kill\
 	_ln\
 	_ls\
+	_test_1\
 	_mkdir\
 	_rm\
 	_sh\
