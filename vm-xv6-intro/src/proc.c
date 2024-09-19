@@ -343,7 +343,7 @@ void scheduler(void) {
       p->state = RUNNING;
 
       // OSTEP
-      cprintf("process about to run: %s, [%d]\n", p->name, p->pid);
+      // cprintf("process about to run: %s, [%d]\n", p->name, p->pid);
       int ticks0 = ticks;
 
       swtch(&(c->scheduler), p->context);
@@ -355,10 +355,6 @@ void scheduler(void) {
 
       // OSTEP
       p->ticks = ticks - ticks0;
-      if (p->tickets > 1) {
-        cprintf("XV6_TEST_OUTPUT pid: %d, parent: %d, tickets:%d, ticks: %d\n",
-                p->pid, p->parent->pid, p->tickets, p->ticks);
-      }
     }
     release(&ptable.lock);
   }
