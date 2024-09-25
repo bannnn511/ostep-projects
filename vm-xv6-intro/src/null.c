@@ -1,21 +1,37 @@
+// #include "types.h"
+// #include "pstat.h"
+// #include "user.h"
+
+// // Userspace Program that writes to 0x0
+// int main(int argc, char *argv[]) {
+//   char *c = 0;
+//   printf(1, "%x\n", *c);
+//   c++;
+//   printf(1, "%x\n", *c);
+//   c++;
+//   printf(1, "%x\n", *c);
+
+//   exit();
+// }
+
 #include "types.h"
-#include "pstat.h"
 #include "user.h"
 
-// Userspace Program that writes to 0x0
-int main(int argc, char *argv[]) {
-  // int *addr = 0x0;
-  // *addr = 1234;
-  // printf(1, "still here\n");
+int main() {
+  int pid;
+  int rc = mprotect((void *)4096, 4096);
+  printf(1, "XV6_TEST_OUTPUT mprotect returned %d\n", rc);
 
-  struct pstat *p;
-  p = 0;
-
-  printf(1, "b4 syscall\n");
-  if (getpinfo(p) < 0) {
-    printf(2, "syscall check null\n");
+  pid = fork();
+  if (pid < 0) {
+    printf(1, "XV6_TEST_OUTPUT init: fork failed\n");
+    exit();
   }
-  printf(1, "still here\n");
-
+  if (pid == 0) {
+    int rc = munprotect((void *)4096, 4096);
+    *(int *)4096 = 1;
+    printf(1, "XV6_TEST_OUTPUT mprotect failed in child process\n");
+  }
+  wait();
   exit();
 }

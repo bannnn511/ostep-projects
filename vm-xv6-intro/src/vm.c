@@ -363,3 +363,53 @@ int copyout(pde_t *pgdir, uint va, void *p, uint len) {
 //  Blank page.
 // PAGEBREAK!
 //  Blank page.
+
+int mprotect(void *addr, int len) {
+  uint i;
+  char *a, *last;
+  pte_t *pte;
+  struct proc *p = myproc();
+
+  if ((uint)addr >= p->sz || (uint)addr + len >= p->sz) {
+    return -1;
+  }
+
+  a = (char *)PGROUNDDOWN((uint)addr);
+  last = (char *)PGROUNDDOWN(((uint)addr) + len - 1);
+  for (; a < last; a += PGSIZE) {
+    if ((pte = walkpgdir(p->pgdir, a, 0)) == 0) {
+      return -1;
+    }
+    *pte &= ~PTE_W;
+  }
+  lcr3(V2P(p->pgdir)); // switch to process's address space
+
+  return 0;
+}
+
+int munprotect(void *addr, int len) {
+  uint i;
+  char *a, *last;
+  pte_t *pte;
+  struct proc *p = myproc();
+
+  if ((uint)addr >= p->sz || (uint)addr + len >= p->sz) {
+    return -1;
+  }
+
+  a = (char *)PGROUNDDOWN((uint)addr);
+  last = (char *)PGROUNDDOWN(((uint)addr) + len - 1);
+  for (;;) {
+    if ((pte = walkpgdir(p->pgdir, a, 0)) == 0) {
+      return -1;
+    }
+    *pte |= PTE_W;
+    if (a >= last)
+      break;
+    a += PGSIZE;
+  }
+
+  lcr3(V2P(p->pgdir)); // switch to process's address space
+
+  return 0;
+}

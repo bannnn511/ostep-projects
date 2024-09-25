@@ -38,7 +38,7 @@ int exec(char *path, char **argv) {
 
   // Load program into memory.
 
-  // OSTEP
+  // OSTEp
   // sz = 0;
   sz = PGSIZE;
   for (i = 0, off = elf.phoff; i < elf.phnum; i++, off += sizeof(ph)) {
@@ -64,14 +64,9 @@ int exec(char *path, char **argv) {
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
   sz = PGROUNDUP(sz);
-  // OSTEP
-  // cprintf("exec page size %d\n", sz);
-  // cprintf("alloc page size %d\n", sz + 2 * PGSIZE);
   if ((sz = allocuvm(pgdir, sz, sz + 2 * PGSIZE)) == 0)
     goto bad;
 
-  // cprintf("exec page size after allocate %d\n", sz);
-  // cprintf("exec page size cleard %d\n", sz - 2 * PGSIZE);
   clearpteu(pgdir, (char *)(sz - 2 * PGSIZE));
   sp = sz;
 

@@ -56,7 +56,6 @@ int argptr(int n, char **pp, int size) {
   if (argint(n, &i) < 0)
     return -1;
   if (size < 0 || (uint)i >= curproc->sz || (uint)i + size > curproc->sz) {
-    cprintf("error here======================\n");
     return -1;
   }
   *pp = (char *)i;
@@ -98,6 +97,8 @@ extern int sys_uptime(void);
 // OSTEP
 extern int sys_settickets(void);
 extern int sys_getpinfo(void);
+extern int sys_mprotect(void);
+extern int sys_munprotect(void);
 
 static int (*syscalls[])(void) = {
     [SYS_fork] = sys_fork,
@@ -124,6 +125,8 @@ static int (*syscalls[])(void) = {
     // OSTEP
     [SYS_settickets] = sys_settickets,
     [SYS_getpinfo] = sys_getpinfo,
+    [SYS_mprotect] = sys_mprotect,
+    [SYS_munprotect] = sys_munprotect,
 };
 
 void syscall(void) {
